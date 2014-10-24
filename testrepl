@@ -1,0 +1,50 @@
+;; Anything you type in here will be executed
+;; immediately with the results shown on the
+;; right.
+(require '[clojure.string :as str])
+(defn split-line [line]
+  "Splits a line of text into a sequence of strings source: pastebin.com/X9yBjJx"
+  (str/split line #" "))
+
+(defn read-lines [filename]
+  "Reads a file and returns a sequence made up of a vector for each line"
+  (with-open [reader (clojure.java.io/reader filename)]
+    (for [line (doall (line-seq reader))] (split-line line))))
+
+(def readstuff (read-lines "/Users/mateus/Github/desafio/edges"))
+(def number-of-edges (count readstuff))
+
+(def mini-edges (drop 940 readstuff))
+(first (first readstuff))
+(last (first readstuff))
+
+(def graph {:20 #{32}})
+;; add edges to the graph in the form of {:1 #{:2 -}} a map of sets
+;;steps: see if node is in the map, if yes addneighbor, if not add node then add neighbor
+
+(def workingedge (nth mini-edges 0))
+
+
+(if (contains? graph (keyword (first workingedge)))
+  (merge-with clojure.set/union graph {:20 #{32}})
+  "no")
+
+;; This adds the neighbor the node in the graph
+(merge-with clojure.set/union {:1 #{"c"}, :2 #{"ae"}} {:1 #{"b"}})
+
+
+;; (def graph {:1 [:2 :3], :2 [:1 :4], :3 [:1 :4], :4 [:2 :3]})
+;;getting edges
+;; (:1 graph)
+;; conj adds elm to end of vector
+;; (conj (:1 graph) :3 :4)
+;; finds :3 in vector
+;; (some #(= :3 %) (:1 a))
+;; (name :1)
+;; (keyword "aeevireikey")
+;; (in? [:1 a] :1)
+;; (get [3 2 1] 0)
+;; by index
+;; (if #(= 4 %) :3)
+
+;;(get {:1 #{:1 :2 :3}} :1)
