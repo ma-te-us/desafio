@@ -17,10 +17,9 @@
   (with-open [reader (clojure.java.io/reader filename)]
     (for [line (doall (line-seq reader))] (split-line line))))
 
-(def readstuff (read-lines "/Users/mateus/Github/desafio/nodes"))
+(def readstuff (read-lines "/Users/mateus/Github/desafio/edges"))
 
 (def number-of-edges (count readstuff))
-
 (defn iterategraph []
   "This populates the map graph so that it that every node is a key and every value is a neighbor of the node"
   (def graph {})
@@ -38,36 +37,47 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World!"))
+  (println "Hello, World!")
+  )
 
  (def nodes (keys graph))
  (def to-visit (set nodes))
  (def visited #{})
+ (def distance 0)
  (def number-of-nodes (count nodes))
 
+
+ ;; Given neighbors, find neighbors' neighbors.
+ (defn find-neighbors [x n current-node]
+   (def neinei #{})
+   (def neinei (apply clojure.set/union (map #(get graph %) x)))
+   (def neinei (clojure.set/difference neinei visited))
+   (def visited (clojure.set/union neinei visited))
+   (def distance (+ (* (+ n 1) (count x)) distance))
+   (if (= (count neinei) 0)
+     (def solution (merge-with clojure.set/union {current-node (/ 1 distance)} solution))
+     (find-neighbors neinei (+ 1 n) current-node))
+   )
+
  ;; This recursion will find the distance to all the nodes starting from a node.
+
  ;; Function #1: Given a node, get it's neighbors.
 
 (defn node-to-neighbors [nodeindex]
- (def current-node (nth nodes nodeindex))
-   (def neighbors (clojure.set/difference (get graph current-node) visited)) ; So it won't visit nodes twice.
-   (def visited (clojure.set/union neighbors visited))
-   (def n 1)
+  (def nodes (keys graph))
+  (def current-node (nth nodes nodeindex))
+  (def neighbors (get graph current-node)) ; So it won't visit nodes twice.
+  (def visited neighbors)
+  (def n 1)
   (def distance 0)
-  (find-neighbors neighbors n)
+  (def distance (+ (* n (count neighbors)) distance))
+  (find-neighbors neighbors n current-node)
   )
- ;; Given neighbors, find neighbors' neighbors.
- (defn find-neighbors [x n]
-  (def neighborsneighbors #{})
-   (map #(def neighborsneighbors (clojure.set/union (get graph %) neighborsneighbors)) (into (vector) neighbors))
-   (def neighborsneighbors (clojure.set/difference neighborsneighbors visited))
 
+ (defn print-solution []
+ (iterategraph)
+ (def solution #{})
+ (doall (map #(node-to-neighbors %) (range 99)))
+   (println "Nodes in order of \"Closeness\" in the form [:Node Closeness]")
+  (println (sort-by val > solution))
    )
-
-
-   (def distance (+ (* n (count neighbors)) distance))
-   (distance-sum-recur neighborsneighbors n)
-(defn distance-sum-recur [neighborsneighbors n]
-  (def distance (+ (* (+ n 1) (count neighborsneighbors)) distance))
-
-  )
