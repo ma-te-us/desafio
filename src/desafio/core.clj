@@ -16,61 +16,58 @@
   "Reads a file and returns a sequence made up of a vector for each line"
   (with-open [reader (clojure.java.io/reader filename)]
     (for [line (doall (line-seq reader))] (split-line line))))
-(def readstuff (read-lines "/Users/mateus/Github/desafio/edges"))
-(def number-of-vertices (count readstuff))
+
+(def readstuff (read-lines "/Users/mateus/Github/desafio/nodes"))
+
+(def number-of-edges (count readstuff))
 
 (defn iterategraph []
   "This populates the map graph so that it that every node is a key and every value is a neighbor of the node"
   (def graph {})
 (loop [iteration 0]
   (def workingvertex (nth readstuff iteration))
-  (def a (merge-with clojure.set/union graph {(keyword (first workingvertex)) #{(read-string (last workingvertex))}}))
-  (def b (merge-with clojure.set/union graph {(keyword (last workingvertex)) #{(read-string (first workingvertex))}}))
+  (def a (merge-with clojure.set/union graph {(keyword (first workingvertex)) #{(keyword (last workingvertex))}}))
+  (def b (merge-with clojure.set/union graph {(keyword (last workingvertex)) #{(keyword (first workingvertex))}}))
   (def graph (merge-with clojure.set/union a b))
-  (if (> iteration (- number-of-vertices 2))
+  (if (> iteration (- number-of-edges 2))
     (println "Graph Generated!")
     (recur (inc iteration)))))
+
 (defn printgraph [] (println (into (sorted-map) graph)))
-  (defn -main
+
+(defn -main
   "I don't do a whole lot ... yet."
   [& args]
   (println "Hello, World!"))
 
+ (def nodes (keys graph))
+ (def to-visit (set nodes))
+ (def visited #{})
+ (def number-of-nodes (count nodes))
+
  ;; This recursion will find the distance to all the nodes starting from a node.
- ;; Key points: Find neighbors, add n*neighbors to distance, add neighbors to visited-nodes, visit neighbor's-neighbors
- ;;   add (n+1)*neighbors-neighbors).
- (def edges (keys graph))
- (def to-visit (set (map read-string (map name edges))))
- (def current-edge (nth edges 0))
- (def neighbors (get graph current-edge))
- (clojure.set/difference to-visit current-edge)
- (def number-of-edges (count edges))
- (def n 1)
- (def distance 0)
- (def distance (+ (* n (count neighbors)) distance))
+ ;; Function #1: Given a node, get it's neighbors.
 
- (defn fib
-  ([n]
-     (fib [0 1] n))
-  ([x, n]
-     (if (< (count x) n)
-       (fib (conj x (+ (last x) (nth x (- (count x) 2)))) n)
-       x)))
+(defn node-to-neighbors [nodeindex]
+ (def current-node (nth nodes nodeindex))
+   (def neighbors (clojure.set/difference (get graph current-node) visited)) ; So it won't visit nodes twice.
+   (def visited (clojure.set/union neighbors visited))
+   (def n 1)
+  (def distance 0)
+  (find-neighbors neighbors n)
+  )
+ ;; Given neighbors, find neighbors' neighbors.
+ (defn find-neighbors [x n]
+  (def neighborsneighbors #{})
+   (map #(def neighborsneighbors (clojure.set/union (get graph %) neighborsneighbors)) (into (vector) neighbors))
+   (def neighborsneighbors (clojure.set/difference neighborsneighbors visited))
 
-;; (println "working edge: " workingvertex)
-;;  (def a (merge-with clojure.set/union graph {(keyword (first workingvertex)) #{(read-string (last workingvertex))}}))
-;;  (def b (merge-with clojure.set/union graph {(keyword (last workingvertex)) #{(read-string (first workingvertex))}}))
+   )
 
-;; (def graph {:1 [:2 :3], :2 [:1 :4], :3 [:1 :4], :4 [:2 :3]})
-;;getting edges
-;; (:1 graph)
-;; conj adds elm to end of vector
-;; (conj (:1 graph) :3 :4)
-;; finds :3 in vector
-;; (some #(= :3 %) (:1 a))
-;; (name :1)
-;; (keyword "aeevireikey")
-;; (in? [:1 a] :1)
-;; (get [3 2 1] 0)
-;; by index
-;; (if #(= 4 %) :3)
+
+   (def distance (+ (* n (count neighbors)) distance))
+   (distance-sum-recur neighborsneighbors n)
+(defn distance-sum-recur [neighborsneighbors n]
+  (def distance (+ (* (+ n 1) (count neighborsneighbors)) distance))
+
+  )
